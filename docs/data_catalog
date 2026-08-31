@@ -1,90 +1,77 @@
+## 📖 Data Catalog for Gold Layer
 
-# Data Catalog for Gold Layer
-
-## Overview
-
-The Gold Layer represents the business-level data mart for the Healthcare Data Warehouse system. It is structured into **Dimension Views** and **Fact Views** using a **Star Schema** to support analytical reporting and BI dashboards (e.g., Power BI).
-
----
-
-### 1. **gold.dim_patients**
-
-* **Purpose:** Stores comprehensive demographic, contact, and insurance information for patients.
-* **Columns:**
+### 1. `gold.dim_patients`
+* **Purpose:** Stores demographic, contact, and insurance profiles for patients.
 
 | Column Name | Data Type | Description |
-| --- | --- | --- |
-| patient_key | INT | Surrogate key uniquely identifying each patient record in the dimension table. |
-| patient_id | VARCHAR(50) | Natural business key assigned to the patient from the source system. |
+|---|---|---|
+| patient_key | INT | Surrogate key uniquely identifying each patient record. |
+| patient_id | VARCHAR(50) | Natural business key assigned to the patient. |
 | first_name | VARCHAR(50) | The patient's first name. |
 | last_name | VARCHAR(50) | The patient's last or family name. |
-| full_name | VARCHAR(100) | Concatenated full name of the patient (e.g., 'John Doe'). |
-| gender | VARCHAR(20) | Standardized gender of the patient (e.g., 'Male', 'Female'). |
-| date_of_birth | DATE | Date of birth of the patient (YYYY-MM-DD). |
-| contact_number | VARCHAR(50) | Phone contact number of the patient. |
-| address | VARCHAR(255) | Residential address of the patient. |
-| registration_date | DATE | Date when the patient registered with the hospital system. |
-| insurance_provider | VARCHAR(100) | Name of the insurance provider company (e.g., 'MedCare Plus'). |
-| insurance_number | VARCHAR(50) | Unique policy or insurance identification number. |
-| email | VARCHAR(100) | Cleaned and lowercased email address of the patient. |
+| full_name | VARCHAR(100) | Concatenated full name of the patient. |
+| gender | VARCHAR(20) | Standardized gender of the patient. |
+| date_of_birth | DATE | Patient date of birth (YYYY-MM-DD). |
+| contact_number | VARCHAR(50) | Phone contact number. |
+| address | VARCHAR(255) | Residential address. |
+| registration_date | DATE | Registration date in the system. |
+| insurance_provider | VARCHAR(100) | Insurance provider company name. |
+| insurance_number | VARCHAR(50) | Policy or insurance identification number. |
+| email | VARCHAR(100) | Lowercased email address. |
 
 ---
 
-### 2. **gold.dim_doctors**
-
-* **Purpose:** Holds master profiles of physicians, including specialization and hospital branch assignments.
-* **Columns:**
+### 2. `gold.dim_doctors`
+* **Purpose:** Stores physician profiles, medical specializations, and branch locations.
 
 | Column Name | Data Type | Description |
-| --- | --- | --- |
-| doctor_key | INT | Surrogate key uniquely identifying each doctor in the dimension table. |
+|---|---|---|
+| doctor_key | INT | Surrogate key uniquely identifying each doctor. |
 | doctor_id | VARCHAR(50) | Natural business key assigned to the doctor. |
-| first_name | VARCHAR(50) | The doctor's first name. |
-| last_name | VARCHAR(50) | The doctor's last name. |
-| full_name | VARCHAR(100) | Formatted full name with title (e.g., 'Dr. Sarah Connor'). |
-| specialization | VARCHAR(50) | Medical field of expertise (e.g., 'Pediatrics', 'Oncology', 'Dermatology'). |
-| phone_number | VARCHAR(50) | Work contact number for the doctor. |
-| years_experience | INT | Total years of professional medical practice. |
-| hospital_branch | VARCHAR(100) | Assigned hospital branch location (e.g., 'Central Hospital', 'Westside Clinic'). |
-| email | VARCHAR(100) | Professional email address of the doctor. |
+| first_name | VARCHAR(50) | Doctor's first name. |
+| last_name | VARCHAR(50) | Doctor's last name. |
+| full_name | VARCHAR(100) | Formatted full name with title (e.g., 'Dr. John Doe'). |
+| specialization | VARCHAR(50) | Medical specialty (e.g., 'Pediatrics', 'Oncology'). |
+| phone_number | VARCHAR(50) | Work contact number. |
+| years_experience | INT | Total years of medical practice. |
+| hospital_branch | VARCHAR(100) | Assigned hospital branch location. |
+| email | VARCHAR(100) | Professional email address. |
 
 ---
 
-### 3. **gold.fact_appointment**
-
-* **Purpose:** Captures operational healthcare transactions, appointment attendance statuses, and clinical procedures performed.
-* **Columns:**
+### 3. `gold.fact_appointment`
+* **Purpose:** Captures operational transactions, appointment statuses, and performed treatments.
 
 | Column Name | Data Type | Description |
-| --- | --- | --- |
-| appointment_key | INT | Primary surrogate key for each appointment fact line item. |
-| appointment_id | VARCHAR(50) | Natural key identifying the specific appointment transaction. |
-| doctor_key | INT | Foreign key linking the appointment to `gold.dim_doctors`. |
-| patient_key | INT | Foreign key linking the appointment to `gold.dim_patients`. |
-| treatment_id | VARCHAR(50) | Unique key for the medical treatment performed during the appointment (if any). |
-| reason_for_visit | VARCHAR(100) | Primary medical reason for the visit (e.g., 'Checkup', 'Consultation', 'Emergency'). |
-| treatment_type | VARCHAR(100) | Type of procedure or test performed (e.g., 'MRI', 'Chemotherapy', 'X-Ray'). |
-| treatment_description | VARCHAR(255) | Detailed description of the clinical treatment administered. |
-| status | VARCHAR(50) | Operational status of the appointment (e.g., 'Completed', 'No-show', 'Cancelled'). |
-| treatment_cost | DECIMAL(10,2) | Cost incurred for the medical procedure/treatment performed. |
-| appointment_date | DATE | Date when the appointment took place or was scheduled for. |
-| appointment_time | TIME(0) | Exact time of the appointment, formatted without fractional seconds. |
-| treatment_date | DATE | Specific date when the treatment was executed. |
+|---|---|---|
+| appointment_key | INT | Primary surrogate key for the fact record. |
+| appointment_id | VARCHAR(50) | Natural key identifying the appointment. |
+| doctor_key | INT | Foreign key linking to `gold.dim_doctors`. |
+| patient_key | INT | Foreign key linking to `gold.dim_patients`. |
+| treatment_id | VARCHAR(50) | Identifier for the medical treatment performed. |
+| reason_for_visit | VARCHAR(100) | Primary reason for the visit (e.g., 'Checkup', 'Emergency'). |
+| treatment_type | VARCHAR(100) | Type of procedure performed (e.g., 'MRI', 'X-Ray'). |
+| treatment_description | VARCHAR(255) | Detailed description of the treatment. |
+| status | VARCHAR(50) | Appointment status ('Completed', 'No-show', 'Cancelled'). |
+| treatment_cost | DECIMAL(10,2) | Cost incurred for the treatment procedure. |
+| appointment_date | DATE | Scheduled appointment date. |
+| appointment_time | TIME(0) | Exact time of the appointment. |
+| treatment_date | DATE | Date when the treatment was performed. |
 
 ---
 
-### 4. **gold.fact_billing**
-
-* **Purpose:** Tracks financial metrics, billing totals, payment statuses, and revenue channels.
-* **Columns:**
+### 4. `gold.fact_billing`
+* **Purpose:** Tracks financial billing, collection statuses, and payment methods.
 
 | Column Name | Data Type | Description |
-| --- | --- | --- |
-| bill_key | INT | Primary surrogate key for each financial billing transaction record. |
-| bill_id | VARCHAR(50) | Unique invoice/bill identifier. |
-| patient_key | INT | Foreign key linking the financial bill to `gold.dim_patients`. |
-| treatment_id | VARCHAR(50) | Identifier of the medical treatment associated with this bill. |
-| payment_method | VARCHAR(50) | Payment channel used by the patient (e.g., 'Credit Card', 'Insurance', 'Cash'). |
-| payment_status | VARCHAR(50) | Status of financial collection (e.g., 'Paid', 'Pending', 'Failed'). |
-| amount | DECIMAL(10,2) | Total billed monetary value for the medical service. |
-| bill_date | DATE | Date when the invoice/bill was generated. |
+|---|---|---|
+| bill_key | INT | Primary surrogate key for the financial transaction. |
+| bill_id | VARCHAR(50) | Unique invoice identifier. |
+| patient_key | INT | Foreign key linking to `gold.dim_patients`. |
+| treatment_id | VARCHAR(50) | Associated medical treatment identifier. |
+| payment_method | VARCHAR(50) | Channel used ('Credit Card', 'Insurance', 'Cash'). |
+| payment_status | VARCHAR(50) | Collection status ('Paid', 'Pending', 'Failed'). |
+| amount | DECIMAL(10,2) | Total billed amount. |
+| bill_date | DATE | Invoice generation date. |
+
+---
