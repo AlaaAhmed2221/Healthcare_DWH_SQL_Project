@@ -1,5 +1,9 @@
+# 📖 Data Catalog - Gold Layer
+
+## Overview
+The Gold Layer represents the business-level data mart for the Healthcare Data Warehouse system. It is structured into **Dimension Views** and **Fact Views** using a **Star Schema** to support analytical reporting and BI dashboards (e.g., Power BI).
+
 ---
-## 📖 Data Catalog for Gold Layer
 
 ### 1. `gold.dim_patients`
 * **Purpose:** Stores demographic, contact, and insurance profiles for patients.
@@ -74,5 +78,3 @@
 | payment_status | VARCHAR(50) | Collection status ('Paid', 'Pending', 'Failed'). |
 | amount | DECIMAL(10,2) | Total billed amount. |
 | bill_date | DATE | Invoice generation date. |
-
----
