@@ -1,1 +1,263 @@
+/*
+  Testing & Data Quality Framework
+To ensure the high reliability and integrity of the data migrating from the Bronze Layer (Raw) to the Silver Layer (Cleaned & Standardized), a comprehensive Data Quality Audit was conducted across all datasets.
 
+Key Testing Areas & Validations:
+
+Primary & Foreign Key Integrity: Verified uniqueness and nullability of primary keys (appointment_id, bill_id, doctor_id, patient_id, treatment_id) and validated referential integrity across relational entities.
+
+String Cleaning & Standardization: Checked for unwanted leading/trailing whitespace using TRIM() checks and ensured consistent casing for critical text fields (e.g., standardizing gender to Male/Female and lowercasing email addresses).
+
+Data Types & Precision Adjustments: Handled time-precision formats by casting appointment_time to TIME(0) to truncate unnecessary fractional seconds.
+
+Domain & Business Logic Rules: Validated that dates (date_of_birth, registration_date, treatment_date) do not exceed current dates, verified that positive values are maintained for financial amounts and costs (amount > 0), and confirmed phone number and insurance string formats.
+
+Result: All validation checks passed successfully. Data loaded into the Silver Layer is fully cleansed, standardized, and primed for Dimensional Modeling in the Gold Layer.
+*/
+
+---------------------appointments--------------
+
+--check unwanted spaces
+select  appointment_id
+from bronze.appointments
+where appointment_id != TRIM(appointment_id)
+
+--check redundancy
+select appointment_id,count(*)
+from bronze.appointments
+group by appointment_id
+having count(*)>1
+
+--check nulls
+select  appointment_id
+from bronze.appointments
+where appointment_id is null
+
+--patient_id---
+--check unwanted spaces
+select  patient_id
+from bronze.appointments
+where patient_id not in (select distinct patient_id from bronze.patients)
+
+--check nulls
+select  patient_id
+from bronze.appointments
+where patient_id is null
+
+--doctor_id--
+--check unwanted spaces
+select  doctor_id
+from bronze.appointments
+where TRIM(doctor_id) not in (select distinct doctor_id from bronze.doctors)
+
+--check nulls
+select  doctor_id
+from bronze.appointments
+where doctor_id is null
+
+--appointment_date
+--check null
+select appointment_date
+from bronze.appointments
+where appointment_date is null
+
+--appointment_time--
+--check unwanted spaces
+select appointment_time
+from bronze.appointments
+where CAST(appointment_time AS VARCHAR(20)) != TRIM(CAST(appointment_time AS VARCHAR(20)));
+
+--edit format
+SELECT CAST(appointment_time AS TIME(0)) AS appointment_time
+FROM bronze.appointments;
+
+--reason for visit-----
+--Data Standardization & Consistency
+select distinct reason_for_visit
+from bronze.appointments
+--unwanted spaces
+select reason_for_visit
+from bronze.appointments
+where reason_for_visit != TRIM(reason_for_visit)
+
+--status
+--Data Standardization & Consistency
+select distinct status
+from bronze.appointments
+--unwanted spaces
+select status
+from bronze.appointments
+where status != TRIM(status)
+
+-----------------------billing------------------------
+select *
+from bronze.billing
+
+--check unique and not null pk
+select bill_id,COUNT(*)
+from bronze.billing
+group by bill_id
+having COUNT(*)>1 
+
+select bill_id
+from bronze.billing
+where bill_id is null
+--un wanted spaces
+select bill_id
+from bronze.billing
+where bill_id != TRIM(bill_id)
+
+--patient id , treatment id
+select treatment_id
+from bronze.billing
+where treatment_id != TRIM(treatment_id)
+
+select treatment_id
+from bronze.billing
+where treatment_id not in (select treatment_id from bronze.treatments)
+
+--bill_date-------
+select bill_date
+from bronze.billing
+where bill_date is null
+--amount---
+select amount
+from bronze.billing
+where amount<=0 
+or amount is null
+--payment method and payment status
+select distinct payment_method
+from bronze.billing
+
+select  payment_method
+from bronze.billing
+where payment_method != TRIM(payment_method)
+
+select distinct payment_status
+from bronze.billing
+
+select  payment_status
+from bronze.billing
+where payment_status != TRIM(payment_status)
+-----------doctors---------------------
+select doctor_id
+from bronze.doctors
+where doctor_id is null
+
+select doctor_id,COUNT(*)
+from bronze.doctors
+group by doctor_id
+having COUNT(*)>1
+--specialization
+select distinct specialization
+from bronze.doctors
+--phone number
+select phone_number
+from bronze.doctors
+where LEN(phone_number) != 10
+or phone_number is null
+--years experience
+select years_experience
+from bronze.doctors
+where years_experience <=0
+or years_experience is null
+--hospital branch
+select distinct hospital_branch
+from bronze.doctors
+
+select  hospital_branch
+from bronze.doctors
+where hospital_branch != TRIM(hospital_branch)
+
+--email--
+select email
+from bronze.doctors
+where email not like 'dr.'+first_name+'.'+last_name+'@hospital.com'
+
+----------------------patients-----------------------
+select patient_id,count(*)
+from bronze.patients
+group by patient_id
+having COUNT(*)>1
+
+select first_name
+from bronze.patients
+where first_name  != TRIM(first_name)
+or first_name is null
+
+select last_name
+from bronze.patients
+where last_name  != TRIM(last_name)
+or last_name is null
+
+select case when gender = 'F' then 'Female'
+            when gender = 'M' then 'Male'
+       end gender
+from bronze.patients
+
+select date_of_birth
+from bronze.patients
+where date_of_birth>GETDATE()
+
+select contact_number
+from bronze.patients
+where contact_number != TRIM(contact_number)
+or contact_number is null
+or LEN(contact_number)!=10
+
+select  address
+from bronze.patients
+where address != TRIM(address)
+
+select registration_date
+from bronze.patients
+where registration_date>GETDATE()
+or registration_date is null
+
+select  distinct insurance_provider
+from bronze.patients
+where insurance_provider != TRIM(insurance_provider)
+
+select  insurance_number
+from bronze.patients
+where insurance_number != TRIM(insurance_number)
+or insurance_number not like 'INS%'
+or LEN(insurance_number)!=9
+
+select email
+from bronze.patients
+where lower (email) not like LOWER( first_name+'.'+last_name+'@mail.com')
+or email is null
+or email != TRIM(email)
+
+---------------------treatment-----------------
+select treatment_id,count(*)
+from bronze.treatments
+group by treatment_id
+having count(*)>1
+
+select treatment_id
+from bronze.treatments
+where treatment_id is null
+
+select appointment_id
+from bronze.treatments
+where appointment_id not in (select appointment_id from bronze.appointments)
+or appointment_id is null
+
+select  treatment_type
+from bronze.treatments
+where treatment_type != TRIM(treatment_type)
+
+select   description
+from bronze.treatments
+where description != TRIM(description)
+
+select cost
+from bronze.treatments
+where cost <=0
+or cost is null
+
+select treatment_date
+from bronze.treatments
+where treatment_date>GETDATE()
