@@ -1,0 +1,56 @@
+--******************************Gold**********************
+select appointment_id,count(*) from (
+SELECT
+ROW_NUMBER() OVER (ORDER BY ap.appointment_id) appointment_key,
+ap.appointment_id,
+do.doctor_key,
+pa.patient_key,
+tr.treatment_id,
+ap.reason_for_visit,
+tr.treatment_type,
+tr.description,
+ap.status,
+tr.cost,
+ap.appointment_date,
+ap.appointment_time,
+tr.treatment_date
+FROM silver.appointments ap
+left join silver.treatments tr
+on ap.appointment_id=tr.appointment_id
+left join gold.dim_patients pa
+on pa.patient_id=ap.patient_id
+left join gold.dim_doctors do
+on do.doctor_id=ap.doctor_id)t
+group by appointment_id
+having count(*)>1
+
+
+select bill_id , count(*) from(
+SELECT
+ROW_NUMBER() OVER (ORDER BY bill_id) bill_key,
+bi.bill_id,
+pa.patient_key,
+bi.treatment_id,
+bi.payment_method,
+bi.payment_status,
+bi.amount,
+bi.bill_date
+FROM silver.billing bi
+left join gold.dim_patients pa
+on pa.patient_id=bi.patient_id)t
+group by bill_id
+having count(*)>1
+
+
+-- Compare Appointments Rows
+SELECT 
+    (SELECT COUNT(*) FROM silver.appointments) AS silver_count,
+    (SELECT COUNT(*) FROM gold.fact_appointment) AS gold_count;
+
+-- Compare Billing Rows
+SELECT 
+    (SELECT COUNT(*) FROM silver.billing) AS silver_count,
+    (SELECT COUNT(*) FROM gold.fact_billing)  AS gold_count;
+
+
+select * from silver.appointments
