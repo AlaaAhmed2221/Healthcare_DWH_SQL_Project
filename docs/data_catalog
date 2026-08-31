@@ -9,7 +9,7 @@ The Gold Layer represents the business-level data mart for the Healthcare Data W
 * **Purpose:** Stores demographic, contact, and insurance profiles for patients.
 
 | Column Name | Data Type | Description |
-|---|---|---|
+| --- | --- | --- |
 | patient_key | INT | Surrogate key uniquely identifying each patient record. |
 | patient_id | VARCHAR(50) | Natural business key assigned to the patient. |
 | first_name | VARCHAR(50) | The patient's first name. |
@@ -30,7 +30,7 @@ The Gold Layer represents the business-level data mart for the Healthcare Data W
 * **Purpose:** Stores physician profiles, medical specializations, and branch locations.
 
 | Column Name | Data Type | Description |
-|---|---|---|
+| --- | --- | --- |
 | doctor_key | INT | Surrogate key uniquely identifying each doctor. |
 | doctor_id | VARCHAR(50) | Natural business key assigned to the doctor. |
 | first_name | VARCHAR(50) | Doctor's first name. |
@@ -48,7 +48,7 @@ The Gold Layer represents the business-level data mart for the Healthcare Data W
 * **Purpose:** Captures operational transactions, appointment statuses, and performed treatments.
 
 | Column Name | Data Type | Description |
-|---|---|---|
+| --- | --- | --- |
 | appointment_key | INT | Primary surrogate key for the fact record. |
 | appointment_id | VARCHAR(50) | Natural key identifying the appointment. |
 | doctor_key | INT | Foreign key linking to `gold.dim_doctors`. |
@@ -69,7 +69,7 @@ The Gold Layer represents the business-level data mart for the Healthcare Data W
 * **Purpose:** Tracks financial billing, collection statuses, and payment methods.
 
 | Column Name | Data Type | Description |
-|---|---|---|
+| --- | --- | --- |
 | bill_key | INT | Primary surrogate key for the financial transaction. |
 | bill_id | VARCHAR(50) | Unique invoice identifier. |
 | patient_key | INT | Foreign key linking to `gold.dim_patients`. |
