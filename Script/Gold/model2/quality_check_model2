@@ -1,0 +1,41 @@
+SELECT 
+    full_date,
+    DATENAME(WEEKDAY, full_date) AS day_name,
+    is_weekend
+FROM gold.dim_date
+WHERE full_date BETWEEN '2026-01-01' AND '2026-01-10'
+ORDER BY full_date;
+
+
+select  *
+FROM gold.fact_billing
+ORDER BY billing_key;
+
+
+select *
+from gold.fact_billing
+where patient_key IS NULL;
+
+
+select fb.bill_id, fb.bill_date_key
+from gold.fact_billing fb
+LEFT JOIN gold.dim_date d
+   on fb.bill_date_key = d.date_key
+where d.date_key IS NULL;
+
+
+select
+    (SELECT COUNT(*) FROM silver.patients) AS silver_patients,
+    (SELECT COUNT(*) FROM gold.dim_patients) AS gold_patients,
+
+    (SELECT COUNT(*) FROM silver.doctors) AS silver_doctors,
+    (SELECT COUNT(*) FROM gold.dim_doctors) AS gold_doctors,
+
+    (SELECT COUNT(*) FROM silver.appointments) AS silver_appointments,
+    (SELECT COUNT(*) FROM gold.dim_appointments) AS gold_appointments,
+
+    (SELECT COUNT(*) FROM silver.treatments) AS silver_treatments,
+    (SELECT COUNT(*) FROM gold.dim_treatments) AS gold_treatments,
+
+    (SELECT COUNT(*) FROM silver.billing) AS silver_billing,
+    (SELECT COUNT(*) FROM gold.fact_billing) AS gold_billing;
